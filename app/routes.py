@@ -1,4 +1,5 @@
 from flask import request, jsonify, current_app, g
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def get_db():
     if 'db' not in g:
@@ -11,10 +12,10 @@ def close_db(e=None):
     db = g.pop('db', None)
     if db is not None:
         db.close()
-        
-def user_exists(username):
+
+def user_exists(email):
     db = get_db()
-    db.execute("SELECT id FROM users WHERE name = %s", (username,))
+    db.execute("SELECT id FROM users WHERE email = %s", (email,))
     return db.fetchone() is not None
 
 def login():
@@ -31,14 +32,13 @@ def login():
             # Get database cursor
             db = get_db()
 
-            # Check if the user exists
+            # Check if the user exists and retrieve the stored hashed password
             db.execute("SELECT password FROM users WHERE email = %s", (email,))
-            user_data = db.fetchone()
+            stored_password = db.fetchone()
 
-            if user_data:
+            if stored_password:
                 # User exists, check the password
-                stored_password = user_data['password']
-                if password == stored_password:
+                if check_password_hash(stored_password['password'], password):
                     return jsonify({"message": "Login successful"})
                 else:
                     return jsonify({"error": "Invalid password"}), 401
@@ -64,11 +64,14 @@ def register():
         db = get_db()
 
         # Check if the user already exists
-        if user_exists(name):
+        if user_exists(email):
             return jsonify({"error": "User already exists"}), 409
 
-        # Insert the new user into the database
-        db.execute("INSERT INTO users (name, password, email) VALUES (%s, %s, %s)", (name, password, email))
+        # Hash the password before storing it in the database
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
+        # Insert the new user into the database with hashed password
+        db.execute("INSERT INTO users (name, password, email) VALUES (%s, %s, %s)", (name, hashed_password, email))
         current_app.config['DB_CONNECTION'].commit()
 
         return jsonify({"message": "User successfully registered"})
