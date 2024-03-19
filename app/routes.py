@@ -21,19 +21,19 @@ def user_exists(email):
 def login():
     with current_app.app_context():
         # Get user input from request
-        email = request.json.get('email')
+        name = request.json.get('username')
         password = request.json.get('password')
 
         # Check if email and password are provided
-        if not email or not password:
-            return jsonify({"error": "Email and password are required"}), 400
+        if not name or not password:
+            return jsonify({"error": "Username and password are required"}), 400
 
         try:
             # Get database cursor
             db = get_db()
 
             # Check if the user exists and retrieve the stored hashed password
-            db.execute("SELECT password FROM users WHERE email = %s", (email,))
+            db.execute("SELECT password FROM users WHERE name = %s", (name,))
             stored_password = db.fetchone()
 
             if stored_password:
