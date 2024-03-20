@@ -1,21 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+import requests
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
-
-# Create users table if not exists
-with app.app_context():
-    db.create_all()
-    
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -25,11 +12,22 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username, password=password).first()
-        if user:
+
+        # Make a POST request to the backend login endpoint
+        backend_url = "http://127.0.0.1:8000/login"  # Update with your backend URL
+        payload = {'username': username, 'password': password}
+        response = requests.post(backend_url, json=payload)
+
+        # Check the response from the backend
+        if response.status_code == 200:
             return f'Welcome, {username}!'
+        elif response.status_code == 401:
+            return 'Invalid password'
+        elif response.status_code == 404:
+            return 'User not found'
         else:
-            return 'Invalid username or password'
+            return 'An error occurred while processing your request'
+
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -39,17 +37,28 @@ def register():
         username = request.form['username']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            return 'Username already exists'
-        elif password != confirm_password:
-            return 'Passwords do not match'
+
+        # Make a POST request to the backend register endpoint
+        backend_url = "http://127.0.0.1:8000/register"  # Update with your backend URL
+        payload = {
+            'email': email,
+            'username': username,
+            'password': password,
+            'confirm_password': confirm_password
+        }
+        response = requests.post(backend_url, json=payload)
+
+        # Check the response from the backend
+        if response.status_code == 200:
+            return redirect(url_for('login'))  # Redirect to login page if registration is successful
+        elif response.status_code == 400:
+            return 'Username, password, and email are required'
+        elif response.status_code == 409:
+            return 'User already exists'
         else:
-            new_user = User(email=email, username=username, password=password)
-            db.session.add(new_user)
-            db.session.commit()
-            return redirect(url_for('login'))
+            return 'An error occurred while processing your request'
+
     return render_template('register.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
