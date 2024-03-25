@@ -12,6 +12,14 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE therapists (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    resume VARCHAR(255) NOT NULL
+);
+
 -- NEEDS
 -- differentiate user types: user and therapist. decided on registration
 -- therapists are able to shcedule meetings

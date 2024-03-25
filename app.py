@@ -26,9 +26,10 @@ except mysql.connector.Error as err:
 
 # Register routes
 with app.app_context():
-    from app.routes import login, register_client
+    from app.routes import login, register_client, register_therapist
     app.add_url_rule('/login', 'login', login, methods=['POST'])
     app.add_url_rule('/register_client', 'register_client', register_client, methods=['POST'])
+    app.add_url_rule('/register_therapist', 'register_therapist', register_therapist, methods=['POST'])
 
 if __name__ == '__main__':
     app.run(debug=True,port=8000)

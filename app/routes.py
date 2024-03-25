@@ -79,6 +79,43 @@ def register_client():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "Database error"}), 500
+    
+def register_therapist():
+    # Get user input from request
+    name = request.form['username']
+    password = request.form['password']
+    email = request.form['email']
+    resume = request.files['resume']  # Get the uploaded resume file
+
+    # Check if username, password, email, and resume are provided
+    if not name or not password or not email or not resume:
+        return jsonify({"error": "Username, password, email, and resume are required"}), 400
+
+    try:
+        # Get database cursor
+        db = get_db()
+
+        # Check if the user already exists
+        if user_exists(email):
+            return jsonify({"error": "User already exists"}), 409
+
+        # Hash the password before storing it in the database
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
+        # Save the resume file
+        resume_path = f"uploads/{resume.filename}"
+        resume.save(resume_path)
+
+        # Insert the new therapist into the database
+        db.execute("INSERT INTO therapists (name, password, email, resume) VALUES (%s, %s, %s, %s)", (name, hashed_password, email, resume_path))
+        current_app.config['DB_CONNECTION'].commit()
+
+        return jsonify({"message": "Therapist successfully registered"})
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "Database error"}), 500
+    
 
 # Register close_db to be called after each request
 current_app.teardown_appcontext(close_db)
