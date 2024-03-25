@@ -49,7 +49,7 @@ def login():
             print(f"Error: {e}")
             return jsonify({"error": "Database error"}), 500
 
-def register():
+def register_client():
     # Get user input from request
     name = request.json.get('username')
     password = request.json.get('password')
