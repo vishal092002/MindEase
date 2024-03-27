@@ -26,6 +26,8 @@ CREATE TABLE therapistSurvey (
     gender ENUM('male', 'female', 'non-binary', 'either') NOT NULL,
     price FLOAT,
     specializations TEXT,
+    bio TEXT,
+    photo VARCHAR(255),
 
     FOREIGN KEY (user_id) REFERENCES therapists (id) ON DELETE CASCADE
 );
