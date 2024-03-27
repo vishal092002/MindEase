@@ -118,7 +118,7 @@
       <p>This is the Register Therapist Page!</p>
 
       <h2>Register</h2>
-      <form action="/register_client" method="POST">
+      <form action="/register_therapist" method="POST" enctype="multipart/form-data">
         <label for="username">Username:</label><br>
         <input type="text" id="username" name="username" required><br>
         <label for="password">Password:</label><br>
@@ -130,7 +130,7 @@
         <label for="resume">Upload Your Resume:</label><br />
         <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx"/><br />
         <input type="submit" value="Register">
-      </form>
+    </form>
     </div>
   </body>
 </html>
