@@ -20,6 +20,15 @@ CREATE TABLE therapists (
     resume VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE therapistSurvey (
+    survey_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    gender ENUM('male', 'female', 'non-binary') NOT NULL,
+    price FLOAT,
+    specializations TEXT,
+
+    FOREIGN KEY (user_id) REFERENCES therapists (id) ON DELETE CASCADE
+);
 -- NEEDS
 -- differentiate user types: user and therapist. decided on registration
 -- therapists are able to shcedule meetings

@@ -116,6 +116,23 @@ def register_therapist():
         print(f"Error: {e}")
         return jsonify({"error": "Database error"}), 500
     
+# insert a therapist survey
+def insert_survey(user_id, gender, price, specializations):
+    try:
+        # Get database cursor
+        db = get_db()
+
+        # Insert the survey into the database
+        db.execute("INSERT INTO therapistSurvey (user_id, gender, price, specialtizations) VALUES (%s, %s, %s, %s)",
+                   (user_id, gender, price, specializations))
+        current_app.config['DB_CONNECTION'].commit()
+
+        return jsonify({"message": "Survey successfully inserted"})
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "Database error"}), 500
+
 
 # Register close_db to be called after each request
 current_app.teardown_appcontext(close_db)
