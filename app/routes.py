@@ -82,13 +82,13 @@ def register_client():
     
 def register_therapist():
     # Get user input from request
-    name = request.form['username']
+    username = request.form['username']
     password = request.form['password']
     email = request.form['email']
     resume = request.files['resume']  # Get the uploaded resume file
 
     # Check if username, password, email, and resume are provided
-    if not name or not password or not email or not resume:
+    if not username or not password or not email or not resume:
         return jsonify({"error": "Username, password, email, and resume are required"}), 400
 
     try:
@@ -107,7 +107,7 @@ def register_therapist():
         resume.save(resume_path)
 
         # Insert the new therapist into the database
-        db.execute("INSERT INTO therapists (name, password, email, resume) VALUES (%s, %s, %s, %s)", (name, hashed_password, email, resume_path))
+        db.execute("INSERT INTO therapists (username, password, email, resume) VALUES (%s, %s, %s, %s)", (username, hashed_password, email, resume_path))
         current_app.config['DB_CONNECTION'].commit()
 
         return jsonify({"message": "Therapist successfully registered"})

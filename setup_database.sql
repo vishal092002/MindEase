@@ -23,7 +23,7 @@ CREATE TABLE therapists (
 CREATE TABLE therapistSurvey (
     survey_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    gender ENUM('male', 'female', 'non-binary') NOT NULL,
+    gender ENUM('male', 'female', 'non-binary', 'either') NOT NULL,
     price FLOAT,
     specializations TEXT,
 
